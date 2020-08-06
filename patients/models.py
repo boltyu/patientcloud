@@ -4,8 +4,9 @@ from django.utils.timezone import now
 
 class Patients(models.Model):
     id = models.AutoField(primary_key=True)
-    idnum = models.CharField(unique=True,null=False,max_length=11)
+    idnum = models.CharField(unique=True,null=False,max_length=17)
     name = models.CharField(null=False,default='None',max_length=64)
+    gender = models.CharField(null=True,max_length=8)
     age = models.IntegerField(null=False,default=1)
     doctor = models.CharField(null=False,default='None',max_length=64)
     description = models.CharField(null=True,default='None',max_length=512)
