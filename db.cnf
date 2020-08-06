@@ -1,0 +1,5 @@
+[client]
+database = patientcloud
+user = root
+password = qwer1234
+default-character-set = utf8
