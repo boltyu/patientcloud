@@ -12,6 +12,7 @@ class Patients(models.Model):
     description = models.CharField(null=True,default='None',max_length=512)
     ddescription = models.CharField(null=False,default='None',max_length=512)
     devicetype = models.CharField(null=False,default='Medtronic',max_length=128)
+    surgerytype = models.CharField(null=False,default='None',max_length=128)
     surgerytime = models.DateTimeField(default=now,editable=True)
     surgerypos = models.CharField(null=False,default='',max_length=128)
     imgpath = models.CharField(null=False,default='',max_length=512)

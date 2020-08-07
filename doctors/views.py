@@ -6,7 +6,7 @@ from .models import Doctors
 # Create your views here.
 @login_required
 def Index(request):
-    return HttpResponse('has logged in')
+    return JsonResponse({'result':200})
 
 
 def Login(request):
