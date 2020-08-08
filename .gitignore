@@ -1,0 +1,7 @@
+db.cnf
+migrations
+__pycache__
+mysql
+*/img
+patientcloud/__init__.py
+media

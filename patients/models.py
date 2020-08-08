@@ -19,6 +19,7 @@ class Patients(models.Model):
     surgerytype = models.IntegerField(null=False, default=1)
     # 设备类型
     devicetype = models.IntegerField(null=False, default=1)
+    
     phone = models.CharField(null=False, default='', max_length=11)
 
     # 创建该患者的医生id
@@ -38,7 +39,7 @@ class Attachment(models.Model):
     # 患者ID
     pid = models.IntegerField(null=False)
     # 文件名
-    filename = models.CharField(null=False, default='', max_length=2048)
+    filename = models.CharField(null=False, default='', max_length=255, unique=True)
     # 文件类型
     # 0: 未定义
     # 1: 头像
@@ -48,21 +49,3 @@ class Attachment(models.Model):
     filetype = models.IntegerField(null=False, default=1)
     # 备注
     remark = models.CharField(null=False, default='', max_length=2048)
-
-'''
-    id = models.AutoField(primary_key=True)
-    idnum = models.CharField(unique=True,null=False,max_length=17)
-    name = models.CharField(null=False,default='None',max_length=64)
-    gender = models.CharField(null=True,max_length=8)
-    age = models.IntegerField(null=False,default=1)
-    doctor = models.CharField(null=False,default='None',max_length=64)
-    description = models.CharField(null=True,default='None',max_length=512)
-    ddescription = models.CharField(null=False,default='None',max_length=512)
-    devicetype = models.CharField(null=False,default='Medtronic',max_length=128)
-    surgerytype = models.CharField(null=False,default='None',max_length=128)
-    surgerytime = models.DateTimeField(default=now,editable=True)
-    surgerypos = models.CharField(null=False,default='',max_length=128)
-    imgpath = models.CharField(null=False,default='',max_length=512)
-    created = models.DateTimeField(default=now,editable=False)
-    modified = models.DateTimeField(auto_now=True,blank=True)
-'''
