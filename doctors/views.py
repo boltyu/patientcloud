@@ -4,10 +4,18 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .models import Doctors
 # Create your views here.
+
+
+
 @login_required
 def Index(request):
     return JsonResponse({'result':200})
 
+def PageLogin(request):
+    return render(request,"html/login.html")
+
+def Upload(request):
+    return render(request,"html/upload.html")
 
 def Login(request):
     re = {'result':200}
@@ -16,9 +24,8 @@ def Login(request):
     user = authenticate(request,username=username,password=password)
     
     if user is not None:
-        doctor = Doctors.objects.get(pk=user.pk)
         login(request,user)
-        request.session['doctor'] = doctor.doctorname
+        request.session['doctor'] = user.pk
         
     else:
         re['result'] = 500
