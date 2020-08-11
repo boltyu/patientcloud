@@ -19,7 +19,7 @@ def Index(request):
             available_patients = Patients.objects.all().filter(doctor=request.session['doctor'])
             patientslist = {}
             for i in available_patients:
-                patientslist[i.idnum] = {'name':i.name,'gender':i.gender,'birthday':i.birthday}
+                patientslist[i.idnum] = {'name':i.name,'birthday':i.birthday,'phone':i.phone}
             result['data'] = patientslist
         elif request.method == 'POST':
             patient = Patients.objects.create(

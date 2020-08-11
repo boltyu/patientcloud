@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.timezone import now
+from django.utils.timezone import now,localdate
 # Create your models here.
 
 
@@ -10,7 +10,7 @@ class Patients(models.Model):
     name = models.CharField(null=False, default='Patient', max_length=64)
     avatar = models.CharField(null=False, default='', max_length=2048)
     gender = models.IntegerField(null=True, default=1)
-    birthday = models.DateTimeField(null=False, default=now)
+    birthday = models.DateField(null=False, default=localdate)
     surgerytime = models.DateTimeField(default=now, editable=True)
 
     # 手术中心
