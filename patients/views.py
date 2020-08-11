@@ -98,7 +98,7 @@ def Picfile(request,idnum,category,filename):
                 elif request.POST['method'] == 'delete':
                     os.remove(fullfilepath)
                     attachment.delete()
-            except:
+            except: # include FileNotFoundError
                     result['result'] = 500
             return JsonResponse(result)
     except Patients.DoesNotExist:
@@ -127,7 +127,9 @@ def Pic(request,idnum,category):
                 for chunk in tmpfile.chunks():
                     filedata=filedata+chunk
                 newname = hashlib.md5(filedata).hexdigest()+"."+tmptype
-                with open('patients/media/'+idnum+"/"+category+"/"+newname,'wb+') as f:
+                filepath = 'patients/media/'+idnum+"/"+category
+                MakesureDirExist(filepath)
+                with open(filepath+"/"+newname,'wb+') as f:
                     f.write(filedata)
                 Attachment.objects.create(pid=patient.pk,filename=newname,filetype=filetype_toint[category])
             #except:#catch all ex?
@@ -142,3 +144,12 @@ def Pic(request,idnum,category):
     return JsonResponse(result)
         
 
+def MakesureDirExist(fullpath):
+    try:
+        os.makedirs(fullpath)
+        return 1
+    except FileExistsError:
+        return 0
+    except:
+        return -2
+    return -1
