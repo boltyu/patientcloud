@@ -31,7 +31,7 @@ def Index(request):
                 remark=request.POST['remark'],
                 devicetype=request.POST['devicetype'],
                 surgerytype=request.POST['surgerytype'],
-                surgerytime=timezone.datetime.strptime(request.POST['surgerytime'],"%Y%m%d %H:%M"),
+                surgerytime=timezone.datetime.strptime(request.POST['surgerytime'],"%Y-%m-%d %H:%M"),
                 surgerycenter=request.POST['surgerycenter'])
             if patient is None:
                 result['result':500]
@@ -54,7 +54,7 @@ def Info(request,idnum):
                 'remark':patient.remark,
                 'devicetype':patient.devicetype,
                 'surgerytype':patient.surgerytype,
-                'surgerytime':patient.surgerytime.strftime("%Y%m%d %H:%M"),
+                'surgerytime':patient.surgerytime.strftime("%Y-%m-%d %H:%M"),
                 'surgerycenter':patient.surgerycenter
             }
             result['data'] = patientdata
@@ -66,7 +66,7 @@ def Info(request,idnum):
             patient.doctor = request.session['doctor']
             patient.devicetype = request.POST['devicetype']
             patient.surgerytype = request.POST['surgerytype']
-            patient.surgerytime = timezone.datetime.strptime(request.POST['surgerytime'],"%Y%m%d %H:%M")
+            patient.surgerytime = timezone.datetime.strptime(request.POST['surgerytime'],"%Y-%m-%d %H:%M")
             patient.surgerycenter = request.POST['surgerycenter']
             patient.save()
     except Patients.DoesNotExist:
