@@ -22,19 +22,33 @@ def Index(request):
                 patientslist[i.idnum] = {'name':i.name,'birthday':i.birthday,'phone':i.phone}
             result['data'] = patientslist
         elif request.method == 'POST':
-            patient = Patients.objects.create(
-                idnum=timezone.datetime.now().strftime("%Y%m%d%H%M%S")+str(random.randrange(100,999,1)),
-                name=request.POST['name'],
-                gender=request.POST['gender'],
-                birthday=request.POST['birthday'],
-                doctor=request.session['doctor'],
-                remark=request.POST['remark'],
-                devicetype=request.POST['devicetype'],
-                surgerytype=request.POST['surgerytype'],
-                surgerytime=timezone.datetime.strptime(request.POST['surgerytime'],"%Y-%m-%d %H:%M"),
-                surgerycenter=request.POST['surgerycenter'])
-            if patient is None:
-                result['result':500]
+            try:
+                idnum = request.POST['idnum']
+            except KeyError:
+                idnum = ""
+            if idnum == "" or idnum == "None":
+                patient = Patients.objects.create(
+                    idnum=timezone.datetime.now().strftime("%Y%m%d%H%M%S")+str(random.randrange(100,999,1)),
+                    name=request.POST['name'],
+                    gender=request.POST['gender'],
+                    birthday=request.POST['birthday'],
+                    phone=request.POST['phone'],
+                    doctor=request.session['doctor'],
+                    remark=request.POST['remark'],
+                    devicetype=request.POST['devicetype'],
+                    surgerytype=request.POST['surgerytype'],
+                    surgerytime=timezone.datetime.strptime(request.POST['surgerytime'],"%Y-%m-%d %H:%M"),
+                    surgerycenter=request.POST['surgerycenter'])
+                if patient is None:
+                    result['result':500]
+            else:
+                patient = Patients.objects.get(idnum=idnum)
+                attachments = Attachment.objects.all().filter(pid=patient.id)
+                for i in attachments:
+                    i.delete()
+                #os.remove 暂不删除文件
+                patient.delete()
+
     except KeyError as e:
         result['result':400]
         print(e)
@@ -48,6 +62,7 @@ def Info(request,idnum):
         patient = Patients.objects.get(doctor=request.session['doctor'],idnum=idnum)
         if request.method == 'GET':
             patientdata = {
+                'phone':patient.phone,
                 'name':patient.name,
                 'gender':patient.gender,
                 'birthday':patient.birthday,
@@ -62,6 +77,7 @@ def Info(request,idnum):
             patient.birthday = request.POST['birthday']
             patient.name = request.POST['name']
             patient.gender = request.POST['gender']
+            patient.phone = request.POST['phone']
             patient.remark = request.POST['remark']
             patient.doctor = request.session['doctor']
             patient.devicetype = request.POST['devicetype']
