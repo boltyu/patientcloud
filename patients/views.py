@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http.response import HttpResponse, JsonResponse, Http404
 from django.contrib.auth.decorators import login_required, permission_required
-from .models import Patients, Attachment
+from .models import Patients, Attachment, SurgeryApproach, DeviceType
 from django.utils import timezone
 import json
 import random
@@ -159,6 +159,36 @@ def Pic(request,idnum,category):
 
     return JsonResponse(result)
         
+
+cache_surgeryapproch = {}
+@login_required
+def SurgeryApproachList(request):
+    result = {'result':200}
+    if request.method == "GET":
+        listall = SurgeryApproach.objects.all()
+        for i in listall:
+            cache_surgeryapproch[str(i.id)] = i.name
+        result['data'] = cache_surgeryapproch
+    elif request.method == 'POST':
+        #tmpobj = SurgeryApproach.objects.create()
+        pass
+    return JsonResponse(result)
+
+cache_devicetype = {}
+@login_required
+def DeviceTypeList(request):
+    result = {'result':200}
+    if request.method == "GET":
+        listall = DeviceType.objects.all()
+        for i in listall:
+            cache_devicetype[str(i.id)] = i.name
+        result['data'] = cache_devicetype
+    elif request.method == 'POST':
+        #tmpobj = SurgeryApproach.objects.create()
+        pass
+    return JsonResponse(result) 
+
+
 
 def MakesureDirExist(fullpath):
     try:

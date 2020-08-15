@@ -49,3 +49,17 @@ class Attachment(models.Model):
     filetype = models.IntegerField(null=False, default=1)
     # 备注
     remark = models.CharField(null=False, default='', max_length=2048)
+
+class DeviceType(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=256)
+    author = models.IntegerField(default=0)
+    modified = models.DateTimeField(auto_now=True)
+
+class SurgeryApproach(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=256)
+    author = models.IntegerField(default=0)
+    modified = models.DateTimeField(auto_now=True)
+
+
