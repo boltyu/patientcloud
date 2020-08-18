@@ -1,7 +1,9 @@
 from django.urls import path
 from . import views
+from .views import IndexView
+
 urlpatterns = [
-    path('',views.Index),
+    path('',IndexView.as_view()),
     path('surgeryapproaches/',views.SurgeryApproachList),
     path('devicetypes/',views.DeviceTypeList),
     path('<str:idnum>/<str:category>/',views.Pic),

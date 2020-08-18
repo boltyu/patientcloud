@@ -3,56 +3,58 @@ from django.http.response import HttpResponse, JsonResponse, Http404
 from django.contrib.auth.decorators import login_required, permission_required
 from .models import Patients, Attachment, SurgeryApproach, DeviceType
 from django.utils import timezone
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 import json
 import random
 import hashlib
 import os
+from PIL import Image
 
 filetype_toint = {"undefine":0,"avatar":1,"pic":2,"eval":3,"epos":4}
 
-# 获取患者列表或者提交一名新的患者
-@login_required
-def Index(request):
-    result = {'result':200}
-    try:
-        if request.method == 'GET':
-            available_patients = Patients.objects.all().filter(doctor=request.session['doctor'])
-            patientslist = {}
-            for i in available_patients:
-                patientslist[i.idnum] = {'name':i.name,'birthday':i.birthday,'phone':i.phone}
-            result['data'] = patientslist
-        elif request.method == 'POST':
-            try:
-                idnum = request.POST['idnum']
-            except KeyError:
-                idnum = ""
-            if idnum == "" or idnum == "None":
-                patient = Patients.objects.create(
-                    idnum=timezone.datetime.now().strftime("%Y%m%d%H%M%S")+str(random.randrange(100,999,1)),
-                    name=request.POST['name'],
-                    gender=request.POST['gender'],
-                    birthday=request.POST['birthday'],
-                    phone=request.POST['phone'],
-                    doctor=request.session['doctor'],
-                    remark=request.POST['remark'],
-                    devicetype=request.POST['devicetype'],
-                    surgerytype=request.POST['surgerytype'],
-                    surgerytime=timezone.datetime.strptime(request.POST['surgerytime'],"%Y-%m-%d %H:%M"),
-                    surgerycenter=request.POST['surgerycenter'])
-                if patient is None:
-                    result['result':500]
-            else:
-                patient = Patients.objects.get(idnum=idnum)
-                attachments = Attachment.objects.all().filter(pid=patient.id)
-                for i in attachments:
-                    i.delete()
-                #os.remove 暂不删除文件
-                patient.delete()
 
-    except KeyError as e:
-        result['result':400]
-        print(e)
-    return JsonResponse(result)
+class IndexView(LoginRequiredMixin,View):
+    login_url = "/doctor/login?"
+    def get(self,request):
+        result = {'result',200}
+        available_patients = Patients.objects.all().filter(doctor=request.session['doctor'])
+        patientslist = {}
+        for i in available_patients:
+            patientslist[i.idnum] = {'name':i.name,'birthday':i.birthday,'phone':i.phone}
+        result['data'] = patientslist
+        return JsonResponse(result)
+    def post(self,request):
+        result = {'result':200}
+        try:
+            idnum = request.POST['idnum']
+        except KeyError:
+            idnum = ""
+        if idnum == "" or idnum == "None":
+            patient = Patients.objects.create(
+                idnum=timezone.datetime.now().strftime("%Y%m%d%H%M%S")+str(random.randrange(100,999,1)),
+                name=request.POST['name'],
+                gender=request.POST['gender'],
+                birthday=request.POST['birthday'],
+                phone=request.POST['phone'],
+                doctor=request.session['doctor'],
+                remark=request.POST['remark'],
+                devicetype=request.POST['devicetype'],
+                surgerytype=request.POST['surgerytype'],
+                surgerytime=timezone.datetime.strptime(request.POST['surgerytime'],"%Y-%m-%d %H:%M"),
+                surgerycenter=request.POST['surgerycenter'])
+            if patient is None:
+                result['result'] = 500
+        else:
+            patient = Patients.objects.get(idnum=idnum)
+            attachments = Attachment.objects.all().filter(pid=patient.id)
+            for i in attachments:
+                i.delete()
+            #os.remove 暂不删除文件
+            patient.delete()
+        return JsonResponse(result)
+# 获取患者列表或者提交一名新的患者
+
 
 # 获取或修改患者idnum的详细信息
 @login_required
@@ -145,17 +147,23 @@ def Pic(request,idnum,category):
                 newname = hashlib.md5(filedata).hexdigest()+"."+tmptype
                 filepath = 'patients/media/'+idnum+"/"+category
                 MakesureDirExist(filepath)
-                with open(filepath+"/"+newname,'wb+') as f:
+                fullfilepath = filepath+"/"+newname
+                with open(fullfilepath,'wb+') as f:
                     f.write(filedata)
+                a = Image.open(fullfilepath)
+                a.save(fullfilepath)
+                a.close()
                 Attachment.objects.create(pid=patient.pk,filename=newname,filetype=filetype_toint[category])
             #except:#catch all ex?
             #    result['result'] = 500
     except Patients.DoesNotExist:
-        result['result'] = 500 
+        result['result'] = 503
     except Patients.MultipleObjectsReturned:
-        result['result'] = 500 
+        result['result'] = 501 
     except KeyError:
-        result['result'] = 500 
+        result['result'] = 502
+    except:
+        reusul['result'] = 500
 
     return JsonResponse(result)
         
