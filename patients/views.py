@@ -13,17 +13,20 @@ from PIL import Image
 
 filetype_toint = {"undefine":0,"avatar":1,"pic":2,"eval":3,"epos":4}
 
-
 class IndexView(LoginRequiredMixin,View):
     login_url = "/doctor/login?"
+
+    # Get user list
     def get(self,request):
-        result = {'result',200}
+        result = {'result':200}
         available_patients = Patients.objects.all().filter(doctor=request.session['doctor'])
         patientslist = {}
         for i in available_patients:
             patientslist[i.idnum] = {'name':i.name,'birthday':i.birthday,'phone':i.phone}
         result['data'] = patientslist
         return JsonResponse(result)
+
+    # Post a new user
     def post(self,request):
         result = {'result':200}
         try:
@@ -53,8 +56,44 @@ class IndexView(LoginRequiredMixin,View):
             #os.remove 暂不删除文件
             patient.delete()
         return JsonResponse(result)
-# 获取患者列表或者提交一名新的患者
 
+def PatientView(LoginRequiredMixin,View):
+    login_url = "/doctor/login?"
+
+    def get(self,request):
+        result = {"result":200}
+        patient = __getPatient()
+        patientdata = {
+                'phone':patient.phone,
+                'name':patient.name,
+                'gender':patient.gender,
+                'birthday':patient.birthday,
+                'remark':patient.remark,
+                'devicetype':patient.devicetype,
+                'surgerytype':patient.surgerytype,
+                'surgerytime':patient.surgerytime.strftime("%Y-%m-%d %H:%M"),
+                'surgerycenter':patient.surgerycenter}
+        result['data'] = patientdata
+    def post(self,request):
+        result = {"result":200}
+        patient = __getPatient()
+        patient.birthday = request.POST['birthday']
+        patient.name = request.POST['name']
+        patient.gender = request.POST['gender']
+        patient.phone = request.POST['phone']
+        patient.remark = request.POST['remark']
+        patient.doctor = request.session['doctor']
+        patient.devicetype = request.POST['devicetype']
+        patient.surgerytype = request.POST['surgerytype']
+        patient.surgerytime = timezone.datetime.strptime(request.POST['surgerytime'],"%Y-%m-%d %H:%M")
+        patient.surgerycenter = request.POST['surgerycenter']
+        patient.save()
+
+    def __getPatient(doctor,patient_idnum):
+        try:
+            return Patients.objects.get(doctor=request.session['doctor'],idnum=patient_idnum)
+        except:
+            print('any error occured here will be catched')
 
 # 获取或修改患者idnum的详细信息
 @login_required
@@ -179,24 +218,34 @@ def SurgeryApproachList(request):
         result['data'] = cache_surgeryapproch
     elif request.method == 'POST':
         #tmpobj = SurgeryApproach.objects.create()
+        UpdateSurgeryApproach()
         pass
     return JsonResponse(result)
+
+def UpdateSurgeryApproach():
+    global cache_surgeryapproch
+    listall = SurgeryApproach.objects.all()
+    for i in listall:
+        cache_surgeryapproch[str(i.id)] = i.name
 
 cache_devicetype = {}
 @login_required
 def DeviceTypeList(request):
     result = {'result':200}
     if request.method == "GET":
-        listall = DeviceType.objects.all()
-        for i in listall:
-            cache_devicetype[str(i.id)] = i.name
+        global cache_devicetype
         result['data'] = cache_devicetype
     elif request.method == 'POST':
         #tmpobj = SurgeryApproach.objects.create()
+        UpdateDeviceType()
         pass
     return JsonResponse(result) 
-
-
+    
+def UpdateDeviceType():
+    global cache_devicetype
+    listall = DeviceType.objects.all()
+    for i in listall:
+        cache_devicetype[str(i.id)] = i.name
 
 def MakesureDirExist(fullpath):
     try:
@@ -207,3 +256,6 @@ def MakesureDirExist(fullpath):
     except:
         return -2
     return -1
+
+
+# Startup
