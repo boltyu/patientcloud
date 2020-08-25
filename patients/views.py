@@ -13,6 +13,9 @@ from PIL import Image
 
 filetype_toint = {"undefine":0,"avatar":1,"pic":2,"eval":3,"epos":4}
 
+
+
+
 class IndexView(LoginRequiredMixin,View):
     login_url = "/doctor/login?"
 
@@ -22,7 +25,7 @@ class IndexView(LoginRequiredMixin,View):
         available_patients = Patients.objects.all().filter(doctor=request.session['doctor'])
         patientslist = {}
         for i in available_patients:
-            patientslist[i.idnum] = {'name':i.name,'birthday':i.birthday,'phone':i.phone}
+            patientslist[i.idnum] = {'name':i.name,'surgerytime':i.surgerytime,'surgerycenter':i.surgerycenter,'avatar':i.avatar}
         result['data'] = patientslist
         return JsonResponse(result)
 
@@ -57,7 +60,7 @@ class IndexView(LoginRequiredMixin,View):
             patient.delete()
         return JsonResponse(result)
 
-def PatientView(LoginRequiredMixin,View):
+class PatientView(LoginRequiredMixin,View):
     login_url = "/doctor/login?"
 
     def get(self,request):
@@ -103,6 +106,7 @@ def Info(request,idnum):
         patient = Patients.objects.get(doctor=request.session['doctor'],idnum=idnum)
         if request.method == 'GET':
             patientdata = {
+                'avatar':patient.avatar,
                 'phone':patient.phone,
                 'name':patient.name,
                 'gender':patient.gender,
@@ -175,6 +179,8 @@ def Pic(request,idnum,category):
             attachments = Attachment.objects.all().filter(pid=patient.pk,filetype=filetype_toint[category])
             for i in attachments:
                 result['data'][i.filename] = i.remark
+                if category == 'avatar':
+                    break
         elif request.method == 'POST':# 提交新文件
             #try:
             for fp in request.FILES:
@@ -187,6 +193,11 @@ def Pic(request,idnum,category):
                 filepath = 'patients/media/'+idnum+"/"+category
                 MakesureDirExist(filepath)
                 fullfilepath = filepath+"/"+newname
+                if category == 'avatar':
+                    patient.avatar = newname
+                    patient.save()
+                
+                    print(patient.idnum + '\'s avatar has update')
                 with open(fullfilepath,'wb+') as f:
                     f.write(filedata)
                 a = Image.open(fullfilepath)
@@ -257,5 +268,7 @@ def MakesureDirExist(fullpath):
         return -2
     return -1
 
+UpdateDeviceType()
+UpdateSurgeryApproach()
 
 # Startup

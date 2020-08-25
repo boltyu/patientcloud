@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import Index
+from .views import Index, DownloadUpdate
 urlpatterns = [
     path('',Index),
     path('admin/', admin.site.urls),
     path('patient/', include('patients.urls')),
-    path('doctor/', include('doctors.urls'))
+    path('doctor/', include('doctors.urls')),
+    path('apk/update/',DownloadUpdate)
 ]
