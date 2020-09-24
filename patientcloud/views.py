@@ -8,9 +8,13 @@ def Index(request):
     return HttpResponse('alright')
 
 
-def DownloadUpdate(request):
+def DownloadUpdate(request,filename):
+    filepath = ""
+    if(filename == "syncrec"):
+        filepath = "./static/base.apk"
+    elif(filename == "update"):
+        filepath = "./static/app-debug.apk"
     imgdata = ""
-    filepath = "./static/base.apk"
     with open(filepath,'rb') as f:
         imgdata = f.read()
     response = HttpResponse(imgdata,content_type="APPLICATION/OCTET-STREAM")

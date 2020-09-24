@@ -10,8 +10,8 @@ import random
 import hashlib
 import os
 from PIL import Image
+from .models import filetype_toint
 
-filetype_toint = {"undefine":0,"avatar":1,"pic":2,"eval":3,"epos":4}
 
 
 
@@ -190,6 +190,7 @@ def Pic(request,idnum,category):
                 for chunk in tmpfile.chunks():
                     filedata=filedata+chunk
                 newname = hashlib.md5(filedata).hexdigest()+"."+tmptype
+                print(newname)
                 filepath = 'patients/media/'+idnum+"/"+category
                 MakesureDirExist(filepath)
                 fullfilepath = filepath+"/"+newname
@@ -200,9 +201,10 @@ def Pic(request,idnum,category):
                     print(patient.idnum + '\'s avatar has update')
                 with open(fullfilepath,'wb+') as f:
                     f.write(filedata)
-                a = Image.open(fullfilepath)
-                a.save(fullfilepath)
-                a.close()
+                # a = Image.open(fullfilepath)
+                # a.save(fullfilepath)
+                # a.close()
+                result['md5'] = newname
                 Attachment.objects.create(pid=patient.pk,filename=newname,filetype=filetype_toint[category])
             #except:#catch all ex?
             #    result['result'] = 500

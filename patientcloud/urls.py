@@ -21,5 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('patient/', include('patients.urls')),
     path('doctor/', include('doctors.urls')),
-    path('apk/update/',DownloadUpdate)
+    path('apk/<str:filename>/',DownloadUpdate)
 ]

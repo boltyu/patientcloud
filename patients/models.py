@@ -3,6 +3,7 @@ from django.utils.timezone import now,localdate
 # Create your models here.
 
 
+
 class Patients(models.Model):
     id = models.AutoField(primary_key=True)
     idnum = models.CharField(unique=True, null=False, max_length=17)
@@ -16,9 +17,9 @@ class Patients(models.Model):
     # 手术中心
     surgerycenter = models.CharField(null=False, default='', max_length=128)
     # 术式
-    surgerytype = models.IntegerField(null=False, default=1)
+    surgerytype = models.ForeignKey('SurgeryApproach',on_delete=models.CASCADE)
     # 设备类型
-    devicetype = models.IntegerField(null=False, default=1)
+    devicetype = models.ForeignKey('DeviceType',on_delete=models.CASCADE)
     
     phone = models.CharField(null=False, default='', max_length=11)
 
@@ -32,7 +33,7 @@ class Patients(models.Model):
     created = models.DateTimeField(default=now, editable=False)
     modified = models.DateTimeField(auto_now=True, blank=True)
 
-
+filetype_toint = {"undefine":0,"avatar":1,"pic":2,"eval":3,"epos":4}
 class Attachment(models.Model):
     # id
     id = models.AutoField(primary_key=True)
@@ -61,5 +62,4 @@ class SurgeryApproach(models.Model):
     name = models.CharField(max_length=256)
     author = models.IntegerField(default=0)
     modified = models.DateTimeField(auto_now=True)
-
 
