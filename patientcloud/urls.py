@@ -19,7 +19,7 @@ from .views import Index, DownloadUpdate
 urlpatterns = [
     path('',Index),
     path('admin/', admin.site.urls),
-    path('patient/', include('patients.urls')),
+    #path('patient/', include('patients.urls')),
     path('doctor/', include('doctors.urls')),
     path('apk/<str:filename>/',DownloadUpdate)
 ]

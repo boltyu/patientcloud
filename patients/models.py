@@ -2,8 +2,6 @@ from django.db import models
 from django.utils.timezone import now,localdate
 # Create your models here.
 
-
-
 class Patients(models.Model):
     id = models.AutoField(primary_key=True)
     idnum = models.CharField(unique=True, null=False, max_length=17)
@@ -24,7 +22,7 @@ class Patients(models.Model):
     phone = models.CharField(null=False, default='', max_length=11)
 
     # 创建该患者的医生id
-    doctor = models.IntegerField()
+    doctor = models.ForeignKey('doctors.Doctors',on_delete=models.CASCADE)
     # 备注
     remark = models.CharField(null=False, default='', max_length=4096)
     # 该条记录是否有效
@@ -38,7 +36,7 @@ class Attachment(models.Model):
     # id
     id = models.AutoField(primary_key=True)
     # 患者ID
-    pid = models.IntegerField(null=False)
+    pid = models.ForeignKey('doctors.Doctors',on_delete=models.CASCADE)
     # 文件名
     filename = models.CharField(null=False, default='', max_length=255, unique=True)
     # 文件类型
